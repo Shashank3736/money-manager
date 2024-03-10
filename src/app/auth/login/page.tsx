@@ -31,11 +31,12 @@ export default function LoginPage() {
     const { result, error } = await signIn(email, password);
 
     if(error) {
-      console.log(error);
+      
+      form.reset()
     }
 
     if(result) {
-      router.push("/auth/login");
+      router.push("/");
       console.log(result.user);
     }
   }
