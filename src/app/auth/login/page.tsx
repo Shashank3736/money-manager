@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/components/ui/use-toast";
 import signIn from "@/firebase/auth/signin";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
@@ -17,6 +18,7 @@ const loginFormSchema = z.object({
 
 export default function LoginPage() {
   const router = useRouter()
+  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof loginFormSchema>>({
     resolver: zodResolver(loginFormSchema),
@@ -31,7 +33,11 @@ export default function LoginPage() {
     const { result, error } = await signIn(email, password);
 
     if(error) {
-      
+      console.log(error.code);
+      toast({
+        description: error.code === "auth/too-many-requests" ? "Too many failed login attempts. Please try again later." : "Invalid email id or password.",
+        variant: "destructive",
+      })
       form.reset()
     }
 
