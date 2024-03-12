@@ -9,6 +9,7 @@ import logo from "/public/assets/logo.jpg"
 import { useTheme } from "next-themes";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import { Moon, Sun } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 export default function Navbar() {
   const auth = getAuth(firebase_app);
@@ -47,8 +48,11 @@ export default function Navbar() {
       </div>
       {user? (
       <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Image src={user.photoURL || ''} alt='logo' width={50} height={50} className="rounded-full w-12 hover:cursor-pointer" />
+        <DropdownMenuTrigger asChild className="hover:cursor-pointer">
+          <Avatar>
+            <AvatarImage src={user?.photoURL || ""} />
+            <AvatarFallback>{user.displayName ? user.displayName[0].toUpperCase():'A'}</AvatarFallback>
+          </Avatar>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
           <DropdownMenuLabel>{user.displayName}</DropdownMenuLabel>
