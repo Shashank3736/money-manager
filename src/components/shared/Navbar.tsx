@@ -15,11 +15,8 @@ export default function Navbar() {
   const auth = getAuth(firebase_app);
   const [user, loading, error] = useAuthState(auth);
   const { setTheme } = useTheme();
-
-  if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
   const provider = new GoogleAuthProvider();
-  console.log(user?.photoURL);
   return (
     <div className="w-full container mx-auto flex justify-between items-center p-4">
       <div className="flex items-center gap-4">
@@ -46,7 +43,11 @@ export default function Navbar() {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      {user? (
+      {loading ? (
+        <Avatar>
+          <AvatarFallback />
+        </Avatar>
+      ) : user? (
       <DropdownMenu>
         <DropdownMenuTrigger asChild className="hover:cursor-pointer">
           <Avatar>
