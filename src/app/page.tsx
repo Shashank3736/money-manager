@@ -1,6 +1,6 @@
 'use client'
 import firebase_app from "@/firebase/config";
-import { addDoc, collection, deleteDoc, doc, getFirestore, query, serverTimestamp, where } from "firebase/firestore";
+import { addDoc, collection, deleteDoc, doc, getFirestore, limit, orderBy, query, serverTimestamp, where } from "firebase/firestore";
 import { useCollection } from "react-firebase-hooks/firestore";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -11,6 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 const addTransactionSchema = z.object({
   account: z.string().min(2, {message: "Need atleast 2 character long"}).max(32, {message: "Too long make it shorter than 32 characters."}),
@@ -23,7 +24,7 @@ export default function Home() {
   const [user] = useAuthState(auth);
   const db = getFirestore(firebase_app);
   const tranCol = collection(db, "transaction");
-  const tranQuery = query(tranCol, where("userId", "==", user? user.uid:''));
+  const tranQuery = query(tranCol, orderBy("date", "desc"), where("userId", "==", user? user.uid:''), limit(5));
   const [trans] = useCollection(tranQuery);
 
   // 1. define form
@@ -132,7 +133,27 @@ export default function Home() {
                   <TableCell>{doc.data().category}</TableCell>
                   <TableCell>{doc.data().amount}</TableCell>
                   <TableCell>{doc.data().date?.toDate().toLocaleString()}</TableCell>
-                  <TableCell><Button variant="outline" color="red" onClick={() => deleteTransaction(doc.id)}>Delete</Button></TableCell>
+                  <TableCell>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="destructive">
+                          Delete
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This action cannot be undone. You will lose this transaction.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>No, go back</AlertDialogCancel>
+                          <AlertDialogAction onClick={() => deleteTransaction(doc.id)}>Yes, delete it</AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
