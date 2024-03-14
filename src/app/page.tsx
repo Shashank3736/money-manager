@@ -1,7 +1,7 @@
 'use client'
 import firebase_app from "@/firebase/config";
-import { addDoc, collection, getFirestore, query, serverTimestamp, where } from "firebase/firestore";
-import { useCollection, useCollectionData } from "react-firebase-hooks/firestore";
+import { addDoc, collection, deleteDoc, doc, getFirestore, query, serverTimestamp, where } from "firebase/firestore";
+import { useCollection } from "react-firebase-hooks/firestore";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -10,6 +10,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 const addTransactionSchema = z.object({
   account: z.string().min(2, {message: "Need atleast 2 character long"}).max(32, {message: "Too long make it shorter than 32 characters."}),
@@ -48,62 +49,100 @@ export default function Home() {
       });
 
       console.log(docRef.id)
+      form.reset()
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const deleteTransaction = async(id: string) => {
+    if(!user) {
+      throw new Error("No user");
+    }
+
+    try {
+      await deleteDoc(doc(db, "transaction", id));
     } catch (error) {
       console.log(error)
     }
   }
   return (
-    <div>
-      <h1>Money Manager</h1>
-      <ul>
-        {trans?.docs.map((doc) => (
-          <li key={doc.id}>{doc.id}</li>
-        ))}
-      </ul>
-      {user && (
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
-          <FormField
-          control={form.control} 
-          name="account" 
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Account</FormLabel>
-              <FormControl>
-                <Input placeholder='account' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-          />
-          <FormField
-          control={form.control}
-          name="category"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Category</FormLabel>
-              <FormControl>
-                <Input placeholder='category' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )} />
-          <FormField
-          control={form.control}
-          name="amount"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Amount</FormLabel>
-              <FormControl>
-                <Input type="number" placeholder='amount' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )} />
-          <Button type="submit">Add Transaction</Button>
-        </form>
-      </Form>
-      )}
+    <div className="container">
+        {user ? (
+        <div className="flex flex-col gap-4">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)}>
+              <div className="flex gap-4 mb-4">
+                <FormField
+                control={form.control} 
+                name="account" 
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Account</FormLabel>
+                    <FormControl>
+                      <Input placeholder='account' {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+                />
+                <FormField
+                control={form.control}
+                name="category"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Category</FormLabel>
+                    <FormControl>
+                      <Input placeholder='category' {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+                <FormField
+                control={form.control}
+                name="amount"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Amount</FormLabel>
+                    <FormControl>
+                      <Input type="number" placeholder='amount' {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+              </div>
+              <Button type="submit">Add Transaction</Button>
+            </form>
+          </Form>
+          <Table>
+            <TableCaption>Transaction History</TableCaption>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Account</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead>Amount</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Delete</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {trans?.docs.map((doc) => (
+                <TableRow key={doc.id}>
+                  <TableCell>{doc.data().account}</TableCell>
+                  <TableCell>{doc.data().category}</TableCell>
+                  <TableCell>{doc.data().amount}</TableCell>
+                  <TableCell>{doc.data().date?.toDate().toLocaleString()}</TableCell>
+                  <TableCell><Button variant="outline" color="red" onClick={() => deleteTransaction(doc.id)}>Delete</Button></TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+    ): (
+      <div>
+        <p>Please sign in</p>
+      </div>
+    )}
     </div>
   );
 }
