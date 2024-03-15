@@ -130,7 +130,7 @@ export default function History() {
             ))}
         </TableBody>
       </Table>
-      <Button className={"mt-5 self-center " + (last || data.length === 0 ? "hidden" : "")} onClick={getTransactions}>Load More</Button>
+      <Button className={"my-5 self-center " + (last || data.length === 0 ? "hidden" : "")} onClick={getTransactions}>Load More</Button>
     </div>
   )
 }
