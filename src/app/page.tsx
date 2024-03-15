@@ -15,6 +15,8 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import Image from "next/image";
 import piggyPlead from '/public/assets/piggy_pleading.png'
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { toast } from "@/components/ui/use-toast";
+import UpdateTransactionForm from "@/components/shared/UpdateTransactionForm";
 
 const addTransactionSchema = z.object({
   account: z.string().min(2, {message: "Need atleast 2 character long"}).max(32, {message: "Too long make it shorter than 32 characters."}),
@@ -22,9 +24,13 @@ const addTransactionSchema = z.object({
   amount: z.string({required_error: "Amount is required"}).transform((v) => Number(v)),
 });
 
-const updateTransactionSchema = addTransactionSchema.extend({
-  id: z.string(),
-})
+const getDate = (date) => {
+  try {
+    return date.toDate().toLocaleString()
+  } catch (error) {
+    return "Invalid Date"
+  }
+}
 
 export default function Home() {
   const auth = getAuth(firebase_app);
@@ -40,16 +46,12 @@ export default function Home() {
     defaultValues: {
       account: "",
       category: "",
-      amount: 0,
     }
-  })
-
-  const updateForm = useForm<z.infer<typeof updateTransactionSchema>>({
-    resolver: zodResolver(updateTransactionSchema),
   })
 
   // 2. handle form
   const onSubmit = async(values: z.infer<typeof addTransactionSchema>) => {
+    console.log(values, 1)
     if(!user) {
       throw new Error("No user");
     }
@@ -59,29 +61,14 @@ export default function Home() {
         date: serverTimestamp(),
         userId: user.uid,
       });
-
-      console.log(docRef.id)
       form.reset()
     } catch (error) {
       console.log(error)
-    }
-  }
-
-  const updateTransaction = async(values: z.infer<typeof updateTransactionSchema>) => {
-    console.log(values, 1)
-    if(!user) {
-      throw new Error("No user");
-    }
-
-    try {
-      await updateDoc(doc(db, "transaction", values.id), {
-        amount: values.amount,
-        category: values.category,
-        account: values.account,
-        userId: user.uid
-      });
-    } catch (error) {
-      console.log(error)
+      toast({
+        title: `Error`,
+        description: "Something went wrong",
+        variant: "destructive",
+      })
     }
   }
 
@@ -160,73 +147,12 @@ export default function Home() {
               {trans?.docs.map((doc) => (
                 <TableRow key={doc.id}>
                   <TableCell>
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button variant="outline">Update</Button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>Update Transaction</DialogTitle>
-                          <DialogDescription>
-                            Update your transaction
-                          </DialogDescription>
-                        </DialogHeader>
-                        <Form {...updateForm}>
-                          <form onSubmit={updateForm.handleSubmit(updateTransaction)}>
-                            <FormField
-                              control={updateForm.control}
-                              name="amount"
-                              defaultValue={doc.data().amount}
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel>Amount</FormLabel>
-                                  <FormControl>
-                                    <Input type="number" placeholder='amount' {...field} />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-                            <FormField
-                              control={updateForm.control}
-                              name="category"
-                              defaultValue={doc.data().category}
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel>Category</FormLabel>
-                                  <FormControl>
-                                    <Input placeholder='category' {...field} />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )} />
-                            <FormField
-                            control={updateForm.control}
-                            name="account"
-                            defaultValue={doc.data().account}
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Account</FormLabel>
-                                <FormControl>
-                                  <Input placeholder='account' {...field} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                            />
-                            <Input type="hidden" value={doc.id} {...updateForm.register("id")} />
-                          </form>
-                        </Form>
-                        <DialogClose asChild>
-                          <Button onClick={() => updateTransaction(updateForm.getValues())} type="submit">Update Transaction</Button>
-                        </DialogClose>
-                      </DialogContent>
-                    </Dialog>                    
+                    <UpdateTransactionForm oldValues={doc.data()} docId={doc.id} user={user} />
                   </TableCell>
                   <TableCell>{doc.data().account}</TableCell>
                   <TableCell>{doc.data().category}</TableCell>
                   <TableCell>{doc.data().amount}</TableCell>
-                  <TableCell>{doc.data().date?.toDate().toLocaleString()}</TableCell>
+                  <TableCell>{getDate(doc.data().date)}</TableCell>
                   <TableCell>
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
