@@ -24,7 +24,7 @@ export default function History() {
   const db = getFirestore(firebase_app);
   const transCol = collection(db, "transaction");
   const [data, setData] = useState<QueryDocumentSnapshot<DocumentData, DocumentData>[]>([])
-  const [count, setCount] = useState(0)
+  const [last, setLast] = useState(false)
 
   const deleteTransaction = async(id: string) => {
     if(!user) {
@@ -50,23 +50,14 @@ export default function History() {
     }
     getDocs(q).then((snapshot) => {
       const extractData = snapshot.docs
+      if(extractData.length < 5) {
+        setLast(true)
+      }
       setData(data.concat(extractData))
     })
   }
 
   if(data.length === 0 && user) getTransactions();
-
-  useEffect(() => {
-    if(!user) return;
-    
-    const q = query(transCol, where("userId", "==", user.uid));
-    getCountFromServer(q).then((count) => {
-      setCount(count.data().count)
-      console.log(count.data().count)
-    }).catch((error) => {
-      console.log(error)
-    })
-  }, [user])
   
   return (
     <div className="container flex flex-col">
@@ -117,7 +108,7 @@ export default function History() {
           ))}
         </TableBody>
       </Table>
-      <Button className={"mt-5 self-center " + (count === data.length ? "hidden" : "")} onClick={getTransactions}>Load More</Button>
+      <Button className={"mt-5 self-center " + (last ? "hidden" : "")} onClick={getTransactions}>Load More</Button>
     </div>
   )
 }
