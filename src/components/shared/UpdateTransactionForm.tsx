@@ -17,7 +17,7 @@ const updateTransactionSchema = z.object({
   amount: z.string().transform((v) => Number(v)),
 });
 
-export default function UpdateTransactionForm({ oldValues, user, docId }: { oldValues: z.infer<typeof updateTransactionSchema>, user: User, docId: string }) {
+export default function UpdateTransactionForm({ oldValues, user, docId, reloadAfter=false }: { oldValues: z.infer<typeof updateTransactionSchema>, user: User, docId: string, reloadAfter: boolean | null }) {
   const db = getFirestore(firebase_app);
   const [open, setOpen] = useState(false);
   // 1. define form
@@ -41,6 +41,9 @@ export default function UpdateTransactionForm({ oldValues, user, docId }: { oldV
         userId: user.uid,
       });
       setOpen(false);
+      if(reloadAfter) {
+        window.location.reload();
+      }
     } catch (error) {
       console.log(error)
     }
