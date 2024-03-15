@@ -3,6 +3,7 @@
 import UpdateTransactionForm from "@/components/shared/UpdateTransactionForm";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import firebase_app from "@/firebase/config"
 import { getAuth } from "firebase/auth";
@@ -74,7 +75,7 @@ export default function History() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {user && data.map((doc) => (
+          {user && data.length > 0 ? data.map((doc) => (
             <TableRow key={doc.id}>
               <TableCell>
                 <UpdateTransactionForm oldValues={doc.data()} docId={doc.id} user={user} />
@@ -105,10 +106,31 @@ export default function History() {
                 </AlertDialog>
               </TableCell>
             </TableRow>
-          ))}
+          )):[...Array(5)].map((i) => (
+            <TableRow key={i}>
+              <TableCell>
+                <Skeleton className="w-full h-10" />
+              </TableCell>
+              <TableCell>
+                <Skeleton className="w-full h-10" />
+              </TableCell>
+              <TableCell>
+                <Skeleton className="w-full h-10" />
+              </TableCell>
+              <TableCell>
+                <Skeleton className="w-full h-10" />
+              </TableCell>
+              <TableCell>
+                <Skeleton className="w-full h-10" />
+              </TableCell>
+              <TableCell>
+                <Skeleton className="w-full h-10" />
+              </TableCell>
+            </TableRow>
+            ))}
         </TableBody>
       </Table>
-      <Button className={"mt-5 self-center " + (last ? "hidden" : "")} onClick={getTransactions}>Load More</Button>
+      <Button className={"mt-5 self-center " + (last || data.length === 0 ? "hidden" : "")} onClick={getTransactions}>Load More</Button>
     </div>
   )
 }
