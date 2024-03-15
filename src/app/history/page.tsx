@@ -44,17 +44,13 @@ export default function History() {
     }
     let q;
     if(data.length > 0) {
-      console.log(data[data.length - 1])
       q = query(transCol, orderBy("date", "desc"), where("userId", "==", user.uid), startAfter(data[data.length - 1]), limit(5));
     } else {
       q = query(transCol, orderBy("date", "desc"), where("userId", "==", user.uid), limit(5));
-    }  
-    console.log(q)
+    }
     getDocs(q).then((snapshot) => {
       const extractData = snapshot.docs
-      console.log(extractData, 31)
       setData(data.concat(extractData))
-      console.log(data.length, count)
     })
   }
 
@@ -62,10 +58,13 @@ export default function History() {
 
   useEffect(() => {
     if(!user) return;
+    
     const q = query(transCol, where("userId", "==", user.uid));
     getCountFromServer(q).then((count) => {
       setCount(count.data().count)
       console.log(count.data().count)
+    }).catch((error) => {
+      console.log(error)
     })
   }, [user])
   
