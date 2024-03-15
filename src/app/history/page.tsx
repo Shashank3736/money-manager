@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import firebase_app from "@/firebase/config"
 import { getAuth } from "firebase/auth";
-import { QueryDocumentSnapshot, collection, deleteDoc, doc, getCountFromServer, getDocs, getFirestore, limit, orderBy, query, startAfter, where } from "firebase/firestore";
+import { DocumentData, QueryDocumentSnapshot, collection, deleteDoc, doc, getCountFromServer, getDocs, getFirestore, limit, orderBy, query, startAfter, where } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 
@@ -23,7 +23,7 @@ export default function History() {
   const [user] = useAuthState(auth);
   const db = getFirestore(firebase_app);
   const transCol = collection(db, "transaction");
-  const [data, setData] = useState([])
+  const [data, setData] = useState<QueryDocumentSnapshot<DocumentData, DocumentData>[]>([])
   const [count, setCount] = useState(0)
 
   const deleteTransaction = async(id: string) => {
@@ -84,7 +84,7 @@ export default function History() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {data.map((doc) => (
+          {user && data.map((doc) => (
             <TableRow key={doc.id}>
               <TableCell>
                 <UpdateTransactionForm oldValues={doc.data()} docId={doc.id} user={user} />
