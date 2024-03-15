@@ -7,7 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import firebase_app from "@/firebase/config"
 import { getAuth } from "firebase/auth";
-import { DocumentData, QueryDocumentSnapshot, collection, deleteDoc, doc, getCountFromServer, getDocs, getFirestore, limit, orderBy, query, startAfter, where } from "firebase/firestore";
+import { DocumentData, QueryDocumentSnapshot, collection, deleteDoc, doc, getCountFromServer, getDocs, getFirestore, limit, onSnapshot, orderBy, query, startAfter, where } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 
@@ -34,6 +34,7 @@ export default function History() {
 
     try {
       await deleteDoc(doc(db, "transaction", id));
+      setData(data.filter((doc) => doc.id !== id))
     } catch (error) {
       console.log(error)
     }
@@ -78,7 +79,7 @@ export default function History() {
           {user && data.length > 0 ? data.map((doc) => (
             <TableRow key={doc.id}>
               <TableCell>
-                <UpdateTransactionForm oldValues={doc.data()} docId={doc.id} user={user} />
+                <UpdateTransactionForm oldValues={doc.data()} docId={doc.id} user={user} reloadAfter={true} />
               </TableCell>
               <TableCell>{doc.data().account}</TableCell>
               <TableCell>{doc.data().category}</TableCell>
