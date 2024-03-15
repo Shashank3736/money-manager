@@ -48,6 +48,7 @@ export default function Home() {
     defaultValues: {
       account: "",
       category: "",
+      amount: ''
     }
   })
 
