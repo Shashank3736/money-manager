@@ -17,6 +17,7 @@ import piggyPlead from '/public/assets/piggy_pleading.png'
 import { toast } from "@/components/ui/use-toast";
 import UpdateTransactionForm from "@/components/shared/UpdateTransactionForm";
 import Link from "next/link";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const addTransactionSchema = z.object({
   account: z.string().min(2, {message: "Need atleast 2 character long"}).max(32, {message: "Too long make it shorter than 32 characters."}),
@@ -34,11 +35,12 @@ const getDate = (date) => {
 
 export default function Home() {
   const auth = getAuth(firebase_app);
-  const [user] = useAuthState(auth);
+  const [user, loadingUser, userError] = useAuthState(auth);
   const db = getFirestore(firebase_app);
   const tranCol = collection(db, "transaction");
   const tranQuery = query(tranCol, orderBy("date", "desc"), where("userId", "==", user? user.uid:''), limit(5));
-  const [trans] = useCollection(tranQuery);
+  const [trans, transLoading, transError] = useCollection(tranQuery);
+  console.log(transError)
 
   // 1. define form
   const form = useForm<z.infer<typeof addTransactionSchema>>({
@@ -85,7 +87,20 @@ export default function Home() {
   }
   return (
     <div className="container">
-        {user ? (
+        {loadingUser ? (
+          <div className="flex flex-col gap-4">
+            <div className="flex gap-4">
+              {[...Array(3)].map((i) => (
+                <div key={i} className="flex flex-col gap-2">
+                  <Skeleton className="h-10 w-20" />
+                  <Skeleton className="h-10 w-40" />
+                </div>
+              ))}
+            </div>
+            <Skeleton className="h-10 w-20" />
+            <Skeleton className="h-[50vh] w-full" />
+          </div>
+        ) : user ? (
         <div className="flex flex-col gap-4">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -146,7 +161,7 @@ export default function Home() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {trans?.docs.map((doc) => (
+              {trans ? trans.docs.map((doc) => (
                 <TableRow key={doc.id}>
                   <TableCell>
                     <UpdateTransactionForm oldValues={doc.data()} docId={doc.id} user={user} />
@@ -175,6 +190,27 @@ export default function Home() {
                         </AlertDialogFooter>
                       </AlertDialogContent>
                     </AlertDialog>
+                  </TableCell>
+                </TableRow>
+              )): [...Array(5)].map((i) => (
+                <TableRow key={i}>
+                  <TableCell>
+                    <Skeleton className="w-full h-10" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="w-full h-10" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="w-full h-10" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="w-full h-10" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="w-full h-10" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="w-full h-10" />
                   </TableCell>
                 </TableRow>
               ))}
