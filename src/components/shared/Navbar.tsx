@@ -10,6 +10,7 @@ import { useTheme } from "next-themes";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import { Moon, Sun } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import Link from "next/link";
 
 export default function Navbar() {
   const auth = getAuth(firebase_app);
@@ -21,7 +22,7 @@ export default function Navbar() {
     <div className="w-full container mx-auto flex justify-between items-center p-4">
       <div className="flex items-center gap-4">
         <Image src={logo} alt='logo' width={100} height={100} className="rounded-full w-16" />
-        <p className="text-2xl font-bold">Money Manager</p>
+        <Link href={"/"} className="text-2xl font-bold">Money Manager</Link>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="icon" className="rounded-full">
