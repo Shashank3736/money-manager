@@ -14,7 +14,6 @@ import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, Tabl
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import Image from "next/image";
 import piggyPlead from '/public/assets/piggy_pleading.png'
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "@/components/ui/use-toast";
 import UpdateTransactionForm from "@/components/shared/UpdateTransactionForm";
 
@@ -34,7 +33,7 @@ const getDate = (date) => {
 
 export default function Home() {
   const auth = getAuth(firebase_app);
-  const [user, loading] = useAuthState(auth);
+  const [user] = useAuthState(auth);
   const db = getFirestore(firebase_app);
   const tranCol = collection(db, "transaction");
   const tranQuery = query(tranCol, orderBy("date", "desc"), where("userId", "==", user? user.uid:''), limit(5));
