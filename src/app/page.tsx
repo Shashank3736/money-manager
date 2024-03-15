@@ -16,6 +16,7 @@ import Image from "next/image";
 import piggyPlead from '/public/assets/piggy_pleading.png'
 import { toast } from "@/components/ui/use-toast";
 import UpdateTransactionForm from "@/components/shared/UpdateTransactionForm";
+import Link from "next/link";
 
 const addTransactionSchema = z.object({
   account: z.string().min(2, {message: "Need atleast 2 character long"}).max(32, {message: "Too long make it shorter than 32 characters."}),
@@ -131,7 +132,9 @@ export default function Home() {
             </form>
           </Form>
           <Table>
-            <TableCaption>Transaction History</TableCaption>
+            <TableCaption>
+              <Link className="hover:underline" href="/history">Transaction History</Link>
+            </TableCaption>
             <TableHeader>
               <TableRow>
                 <TableHead>Update</TableHead>
