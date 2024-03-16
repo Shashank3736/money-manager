@@ -1,0 +1,36 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+		match /transaction/{transactionId} {
+    	allow get, delete, count: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow list: if request.auth != null && request.auth.uid == resource.data.userId &&
+      request.query.limit <= 5;
+    	allow create: if request.auth != null && 
+      request.auth.uid == request.resource.data.userId &&
+      isValidString(request.resource.data.account, 2, 32) &&
+      isValidNumber(request.resource.data.amount) &&
+      isValidDate(request.resource.data.date) &&
+      isValidString(request.resource.data.category, 2, 32);
+      allow update: if request.auth != null && 
+      request.auth.uid == request.resource.data.userId &&
+      request.auth.uid == resource.data.userId &&
+      isValidString(request.resource.data.account, 2, 32) &&
+      isValidNumber(request.resource.data.amount) &&
+      isValidDate(request.resource.data.date) &&
+      isValidString(request.resource.data.category, 2, 32);
+    }
+  }
+}
+
+function isValidString(str, minLength, maxLength) {
+  return str is string && str.size() >= minLength && str.size() <= maxLength;
+}
+
+function isValidNumber(num) {
+  return num is number;
+}
+
+function isValidDate(date) {
+  return date is timestamp;
+}
