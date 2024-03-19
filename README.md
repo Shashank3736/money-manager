@@ -1,55 +1,13 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
-
-## Getting Started
-
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
-## Tech Stack
-Shashank3736/money-manager is built on the following main stack:
-
-- [TypeScript](http://www.typescriptlang.org) – Languages
-- [JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript) – Languages
-- [Autoprefixer](https://github.com/postcss/autoprefixer) – CSS Pre-processors / Extensions
-- [Next.js](https://nextjs.org/) – Frameworks (Full Stack)
-- [Node.js](http://nodejs.org/) – Frameworks (Full Stack)
-- [PostCSS](https://github.com/postcss/postcss) – CSS Pre-processors / Extensions
-- [React](https://reactjs.org/) – Javascript UI Libraries
-- [Tailwind CSS](https://tailwindcss.com) – Front-End Frameworks
-- [Firebase](https://firebase.google.com/) – Realtime Backend / API
-- [ESLint](http://eslint.org/) – Code Review
-
-Full tech stack [here](/techstack.md)
-
+# Money Manager
+Simple website to manage your daily expenses.
+## Features
+- Backend support with Firebase.
+- Google Authentication.
+- Firestore as database.
+- Strong firstore rule to protect data from abuse.
+- Beautiful UI with Next.js and shadcn components.
+- Infinite scroll for transaction history.
+- Update of transaction data in realtime on website without reload.
 ## Tech Stack
 Shashank3736/money-manager is built on the following main stack:
 
